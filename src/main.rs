@@ -1,3 +1,5 @@
+use axum::extract::Query;
+use serde::Deserialize;
 use std::net::SocketAddr;
 
 use axum::response::{Html, IntoResponse};
@@ -16,8 +18,15 @@ async fn main() {
         .unwrap();
 }
 
-async fn handle_hello() -> impl IntoResponse {
+#[derive(Debug, Deserialize)]
+struct HelloParams {
+    name: Option<String>,
+}
+
+async fn handle_hello(Query(params): Query<HelloParams>) -> impl IntoResponse {
     println!("-> {:<12} - handler_hello", "HANDLER");
 
-    Html("Hello <strong>World!!!</strong>")
+    let name = params.name.as_deref().unwrap_or("World!");
+
+    Html(format!("Hello <strong>{name}!!!</strong>"))
 }
